@@ -59,6 +59,20 @@ Class {
 	#category : #SRT2VTT
 }
 
+{ #category : #commandline }
+SRT2VTT class >> srt2vtt [
+	<commandline>
+	^ (ClapCommand withName: 'srt2vtt')
+			addPositional: ((ClapPositional withName: 'path')
+				meaning: [ :path | FileSystem disk workingDirectory resolve: path ];
+				defaultMeaning: [ FileSystem disk workingDirectory ]);
+		
+		meaning: [ :args |
+			self new
+				process: (args atName: 'path') ]
+
+]
+
 { #category : #files }
 SRT2VTT >> doNotEraseExistingVTTFiles [
 	eraseExistingVTTFiles := false
@@ -156,6 +170,13 @@ SRT2VTT >> outGotoLine [
 { #category : #files }
 SRT2VTT >> process [
 	srtFiles do: [ :each | self processFile: each ]
+]
+
+{ #category : #files }
+SRT2VTT >> process: aFileReference [
+	aFileReference isDirectory
+		ifTrue: [ self srtFilesInDirectory: aFileReference ]
+		ifFalse: [ self processFile: aFileReference ]
 ]
 
 { #category : #files }
