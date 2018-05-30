@@ -7,7 +7,10 @@ Class {
 { #category : #baselines }
 BaselineOfSRT2VTT >> baseline: spec [
 	<baseline>
-	spec for: #common do: [ spec
-		baseline: 'Clap' with: [ spec repository: 'github://cdlm/clap-st' ];
-		package: 'SRT2VTT' ]
+	spec for: #common do: [ 
+		spec
+			baseline: 'Clap' with: [ spec repository: 'github://cdlm/clap-st/src' ];
+			package: 'SRT2VTT' ;
+			package: 'SRT2VTT-Clap' with: [
+				spec requires: #('SRT2VTT' 'Clap') ]]
 ]
