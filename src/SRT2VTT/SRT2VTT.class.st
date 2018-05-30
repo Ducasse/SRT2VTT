@@ -45,7 +45,6 @@ Class {
 		'in',
 		'out',
 		'currentLine',
-		'srtFiles',
 		'vttFiles',
 		'eraseExistingVTTFiles'
 	],
@@ -59,23 +58,9 @@ Class {
 	#category : #SRT2VTT
 }
 
-{ #category : #commandline }
-SRT2VTT class >> srt2vtt [
-	<commandline>
-	^ (ClapCommand withName: 'srt2vtt')
-			addPositional: ((ClapPositional withName: 'path')
-				meaning: [ :path | FileSystem disk workingDirectory resolve: path ];
-				defaultMeaning: [ FileSystem disk workingDirectory ]);
-		
-		meaning: [ :args |
-			self new
-				process: (args atName: 'path') ]
-
-]
-
-{ #category : #files }
+{ #category : #erase }
 SRT2VTT >> doNotEraseExistingVTTFiles [
-	eraseExistingVTTFiles := false
+	self setEraseExistingVTTFiles: false
 ]
 
 { #category : #output }
@@ -104,17 +89,17 @@ SRT2VTT >> emitWebVTTLine [
 	self outGotoLine
 ]
 
-{ #category : #files }
+{ #category : #erase }
 SRT2VTT >> eraseExistingVTTFiles [
 
-	eraseExistingVTTFiles := true
+	self setEraseExistingVTTFiles: true
 ]
 
 { #category : #converting }
 SRT2VTT >> go [
 	self emitWebVTTLine.
 	[ in atEnd ]
-		whileFalse: [ self treatOneBlock. ]
+		whileFalse: [ self treatOneBlock ]
 ]
 
 { #category : #accessing }
@@ -127,6 +112,7 @@ SRT2VTT >> initialize [
 	super initialize.
 	in := '' readStream.
 	out := '' writeStream.
+	vttFiles := OrderedCollection new.
 	self doNotEraseExistingVTTFiles.
 	
 ]
@@ -141,7 +127,8 @@ SRT2VTT >> isDurationLine [
 { #category : #read }
 SRT2VTT >> isEmptyLine [
 	"Returns true if the line is empty"
-	^ currentLine isEmpty 
+
+	^ in atEnd or: [ currentLine isEmpty ]
 ]
 
 { #category : #read }
@@ -168,11 +155,6 @@ SRT2VTT >> outGotoLine [
 ]
 
 { #category : #files }
-SRT2VTT >> process [
-	srtFiles do: [ :each | self processFile: each ]
-]
-
-{ #category : #files }
 SRT2VTT >> process: aFileReference [
 	aFileReference isDirectory
 		ifTrue: [ self srtFilesInDirectory: aFileReference ]
@@ -185,38 +167,43 @@ SRT2VTT >> processFile: aSrtFileReference [
 		asFileReference
 	"
 	| vtt rstream wstream |
-	vtt := (aSrtFileReference withExtension: 'vtt').
+	vtt := aSrtFileReference withExtension: 'vtt'.
 	(vttFiles includes: vtt)
 		ifTrue: [ ^ self ].
 	
 	rstream := aSrtFileReference readStream.	
 	wstream := vtt writeStream.
 	[ self in: rstream.
-	self out: vtt writeStream.
+	self out: wstream.
 	self go] ensure: [ rstream close. wstream close ]
 ]
 
 { #category : #read }
 SRT2VTT >> readLine [
-	currentLine := in upToAnyOf: {Character cr . Character lf}.
+	"currentLine := in upToAny: {Character cr . Character lf}.
 	(in peekBack = Character cr and: [ in peek = Character lf ])
-							ifTrue: [ in next ].
+							ifTrue: [ in next ]."
+	currentLine := (ZnFastLineReader on: in) nextLine.
 	^ currentLine
+]
+
+{ #category : #erase }
+SRT2VTT >> setEraseExistingVTTFiles: aBoolean [
+	eraseExistingVTTFiles := aBoolean
 ]
 
 { #category : #files }
 SRT2VTT >> srtFilesInDirectory: aPath [
 	"self new srtFilesInDirectory: '/Users/ducasse/Library/Application Support/Pharo/images/09-08-2016-PillarDevOn60' asFileReference"
-
+	| srtFiles |
 	srtFiles := aPath asFileReference allChildren
 		select: [ :each | each extension = 'srt' ].
 
 	"to erase existing vtt files we simply 
 	say that none are already existing"
-	eraseExistingVTTFiles
-		ifTrue: [ vttFiles := #() ]
-		ifFalse: [ vttFiles := aPath asFileReference allChildren
-				select: [ :each | each extension = 'vtt' ] ].
+	vttFiles := eraseExistingVTTFiles
+		ifTrue: [  #() ]
+		ifFalse: [ aPath asFileReference allChildren select: [ :each | each extension = 'vtt' ] ].
 	srtFiles do: [ :each | self processFile: each ].
 ]
 

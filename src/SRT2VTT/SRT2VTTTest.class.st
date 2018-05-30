@@ -90,10 +90,8 @@ SRT2VTTTest >> testIsEmptyLine [
 SRT2VTTTest >> testLine [
 
 	| srt |
-	srt := SRT2VTT new
-		in: self class srtSample readStream.
-		
-	self assert: (srt readLine)  = '1'
+	srt := SRT2VTT new in: self class srtSample readStream.
+	self assert: srt readLine equals: '1'
 ]
 
 { #category : #tests }
@@ -109,7 +107,7 @@ SRT2VTTTest >> testLineIsInteger [
 SRT2VTTTest >> testReadLine [
 	| srt |
 	srt := SRT2VTT new in: self class srtSample readStream.
-	self assert: srt readLine = '1'
+	self assert: srt readLine equals: '1'
 ]
 
 { #category : #tests }
