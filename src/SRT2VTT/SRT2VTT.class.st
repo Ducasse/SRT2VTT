@@ -128,7 +128,7 @@ SRT2VTT >> isDurationLine [
 SRT2VTT >> isEmptyLine [
 	"Returns true if the line is empty"
 
-	^ in atEnd or: [ currentLine isEmpty ]
+	^  currentLine isEmpty 
 ]
 
 { #category : #read }
@@ -215,8 +215,9 @@ SRT2VTT >> treatOneBlock [
 	self emitConvertedDuration.
 	self emitAlignMiddle.	"Now we will produce text line by line."
 	[ self readLine.
-	self isEmptyLine ]
+	in atEnd or: [ self isEmptyLine ]]
 		whileFalse: [ self emitCurrentLine ].
+	in atEnd ifTrue: [ self emitCurrentLine ].
 	self outGotoLine.
 	
 ]
