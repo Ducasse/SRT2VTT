@@ -9,7 +9,6 @@ SRT2VTTCommandLine class >> clap [
 	<commandline>
 	
 	^ (ClapCommand withName: 'srt2vtt')
-		addFlag: (ClapFlag withName: 'recursive');
 		addFlag: (ClapFlag withName: 'eraseExisting');
 		addPositional: ((ClapPositional withName: 'path') defaultMeaning: [ '.' ]);
 		"when there is no positional, we take the current directory"
