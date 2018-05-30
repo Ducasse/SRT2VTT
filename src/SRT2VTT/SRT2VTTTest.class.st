@@ -39,6 +39,14 @@ and closures called blocks.
 There''ll be a course about blocks.'
 ]
 
+{ #category : #sample }
+SRT2VTTTest class >> srtSampleShorter [
+
+	^ '35
+00:01:55,520 --> 00:01:56,720
+Disfrute.'
+]
+
 { #category : #tests }
 SRT2VTTTest >> testGo [
 	| srt |
@@ -125,4 +133,19 @@ SRT2VTTTest >> testTreatOneBlock [
 Hello. This week,
 we''ll get to the heart of the matter,
 '
+]
+
+{ #category : #tests }
+SRT2VTTTest >> testTreatOneBlockLessLine [
+	| srt |
+	srt := SRT2VTT new in: self class srtSampleShorter readStream.
+	srt
+		emitWebVTTLine;
+		treatOneBlock.
+	srt out contents
+		=
+			'WEBVTT
+
+00:01:55.520 --> 00:01:56.720 align:middle
+Disfrute.'
 ]
