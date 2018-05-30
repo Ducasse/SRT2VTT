@@ -11,6 +11,6 @@ BaselineOfSRT2VTT >> baseline: spec [
 		spec
 			baseline: 'Clap' with: [ spec repository: 'github://cdlm/clap-st/src' ];
 			package: 'SRT2VTT' ;
-			package: 'SRT2VTT-Clap' with: [
+			package: 'SRT2VTT-CLAP' with: [
 				spec requires: #('SRT2VTT' 'Clap') ]]
 ]
