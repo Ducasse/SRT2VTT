@@ -1,3 +1,6 @@
+"
+pharo /Users/ducasse/Documents/Pharo/images/2018-05-30-SRT/2018-05-30-SRT.image clap srt2vtt ES_C019SD-W2-S11.srt
+"
 Class {
 	#name : #SRT2VTTCommandLine,
 	#superclass : #Object,

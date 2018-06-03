@@ -183,7 +183,9 @@ SRT2VTT >> readLine [
 	"currentLine := in upToAny: {Character cr . Character lf}.
 	(in peekBack = Character cr and: [ in peek = Character lf ])
 							ifTrue: [ in next ]."
-	currentLine := (ZnFastLineReader on: in) nextLine.
+	| line |
+	line := (ZnFastLineReader on: in) nextLine.
+	currentLine := line ifNil: [ '' ] ifNotNil: [ line ].
 	^ currentLine
 ]
 
@@ -211,6 +213,7 @@ SRT2VTT >> srtFilesInDirectory: aPath [
 SRT2VTT >> treatOneBlock [
 
 	self readLine.	"This is an integerLine"
+	self validateInteger.
 	self readLine.	"reading duration"
 	self emitConvertedDuration.
 	self emitAlignMiddle.	"Now we will produce text line by line."
@@ -220,4 +223,10 @@ SRT2VTT >> treatOneBlock [
 	in atEnd ifTrue: [ self emitCurrentLine ].
 	self outGotoLine.
 	
+]
+
+{ #category : #read }
+SRT2VTT >> validateInteger [
+
+	[ (Integer readFrom: currentLine) ] on: Error do: [ Stdio stderr nextPutAll: 'Expecting an integer and got instead: ', currentLine ] 
 ]
