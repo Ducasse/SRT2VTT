@@ -169,10 +169,10 @@ SRT2VTT >> processFile: aSrtFileReference [
 	| vtt rstream wstream |
 	vtt := aSrtFileReference withExtension: 'vtt'.
 	(vttFiles includes: vtt)
-		ifTrue: [ ^ self ].
+		ifTrue: [ ^ self].
 	
 	rstream := aSrtFileReference readStream.	
-	wstream := vtt writeStream.
+	wstream := FileStream forceNewFileNamed: vtt.
 	[ self in: rstream.
 	self out: wstream.
 	self go] ensure: [ rstream close. wstream close ]
